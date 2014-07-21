@@ -46,6 +46,10 @@ class DiscreteTimeMarkovChain(object):
         G = self._as_digraph()
         return networkx.number_strongly_connected_components(G) == 1
 
+    def aperiodic(self):
+        G = self._as_digraph()
+        return networkx.is_aperiodic(G)
+
     def stationary_distribution(self):
         # in MATLAB, this is simply A\b
         # in Python, things are a little uglier, because numpy.linalg.solve
@@ -68,6 +72,7 @@ class DiscreteTimeMarkovChain(object):
         return numpy.linalg.lstsq(A, b)[0]
 
     def absorbing(self, i, eps = 1e-10):
+        # TODO - is this the right way to do this?
         return (self._P[i, i] - 1.0) < eps
 
     def absorbing_states(self):
@@ -80,5 +85,17 @@ class DiscreteTimeMarkovChain(object):
     def is_absorbing(self):
         # TODO - This is a TDD placeholder
         return len(self.absorbing_states()) > 0
+
+    def communicating_classes(self):
+        G = self._as_digraph()
+        return list(networkx.strongly_connected_components(G))
+
+    def recurrent_classes(self):
+        raise NotImplementedError('todo')
+        return []
+
+    def transient_classes(self):
+        raise NotImplementedError('todo')
+        return []
 
 
