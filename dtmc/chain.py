@@ -36,8 +36,32 @@ class DiscreteTimeMarkovChain(object):
     def _as_digraph(self):
         return networkx.DiGraph(self._P)
 
+    def _as_dense(self):
+        return self._P
+
     def irreducible(self):
         G = self._as_digraph()
         return networkx.number_strongly_connected_components(G) == 1
+
+    def stationary_distribution(self):
+        # in MATLAB, this is simply A\b
+        # in Python, things are a little uglier, because numpy.linalg.solve
+        #   only deals with square matrices.
+        
+        P = self._as_dense()
+        n = P.shape[0]
+        I = numpy.eye(n)
+        # the transpose here is because we're working with a stationary row
+        # vector rather than a column vector
+        P = P.T - I
+
+        # we need to add an extra row of 1s at the bottom
+        A = numpy.vstack([P, numpy.ones(n)])
+
+        # everything sums to zero, except the last row, which sums to 1
+        b = numpy.zeros(n+1)
+        b[-1] = 1
+
+        return numpy.linalg.lstsq(A, b)[0]
 
 
