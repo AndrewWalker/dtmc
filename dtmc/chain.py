@@ -39,6 +39,9 @@ class DiscreteTimeMarkovChain(object):
     def _as_dense(self):
         return self._P
 
+    def _num_states(self):
+        return self._P.shape[0]
+
     def irreducible(self):
         G = self._as_digraph()
         return networkx.number_strongly_connected_components(G) == 1
@@ -63,5 +66,15 @@ class DiscreteTimeMarkovChain(object):
         b[-1] = 1
 
         return numpy.linalg.lstsq(A, b)[0]
+
+    def absorbing(self, i, eps = 1e-10):
+        return (self._P[i, i] - 1.0) < eps
+
+    def absorbing_states(self):
+        """Return a list of states that are absorbing
+
+        A state is absorbing, if it is impossible to leave that state. 
+        """
+        return [ i for i in xrange(self._num_states()) if self.absorbing(i) ]
 
 

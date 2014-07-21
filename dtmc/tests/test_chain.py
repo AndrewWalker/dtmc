@@ -25,3 +25,7 @@ class DiscreteTimeMarkovChainTest(unittest.TestCase):
         pi = chain.stationary_distribution()
         expected = numpy.array([0.5,0.5])
         numpy.testing.assert_allclose(pi, expected)
+
+    def test_trivial_absorbing(self):
+        chain = dtmc.DiscreteTimeMarkovChain([[1.,0.],[0.,1.]])
+        self.assertEquals(chain.absorbing_states(), [0, 1])
