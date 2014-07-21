@@ -77,4 +77,8 @@ class DiscreteTimeMarkovChain(object):
         """
         return [ i for i in xrange(self._num_states()) if self.absorbing(i) ]
 
+    def is_absorbing(self):
+        # TODO - This is a TDD placeholder
+        return len(self.absorbing_states()) > 0
+
 

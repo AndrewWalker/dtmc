@@ -29,3 +29,16 @@ class DiscreteTimeMarkovChainTest(unittest.TestCase):
     def test_trivial_absorbing(self):
         chain = dtmc.DiscreteTimeMarkovChain([[1.,0.],[0.,1.]])
         self.assertEquals(chain.absorbing_states(), [0, 1])
+
+    def test_is_absorbing(self):
+        chain = dtmc.DiscreteTimeMarkovChain([[1.]])
+        self.assertTrue(chain.is_absorbing())
+        
+        chain = dtmc.DiscreteTimeMarkovChain([[1.,0.],[0.,1.]])
+        self.assertTrue(chain.is_absorbing())
+
+    def test_is_absorbing_disjoint(self):
+        P = [[1., 0., 0.], [0., 0., 1.], [0., 1., 0.]]
+        chain = dtmc.DiscreteTimeMarkovChain(P)
+        self.assertFalse(chain.is_absorbing())
+
