@@ -13,4 +13,21 @@ def random_walk_graph(nsteps, absorbing = False):
         M[i, i] = 1
     return nx.DiGraph(M)
 
+def stock_market():
+    """Transition Matrix for the bull-bear-stagnant market from wikipedia
+    """
+    return numpy.array([ 
+        [0.9,  0.075,  0.025], 
+        [0.15,   0.8,   0.05], 
+        [0.25,  0.25,   0.5 ] 
+    ])
 
+def simple_weather():
+    """Transition Matrix for the simple weather example on wikipedia
+    """
+    return numpy.array([
+        [0.9, 0.1], 
+        [0.5, 0.5], 
+    ])
+
+# TODO - land of oz example
