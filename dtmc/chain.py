@@ -7,8 +7,45 @@ class DTMCError(Exception):
 def is_square(P):
     return P.shape[0] == P.shape[1]
 
-def is_right_stochastic(P):
+def is_stochastic(P):
+    """True if a matrix is stochastic 
+   
+    All entries must be non-negative and rows must sum to one
+    """
+    if not numpy.all(P >= 0):
+        return False
+
+    # potentially not a good test
     return numpy.count_nonzero(numpy.sum(P, axis = 1) - 1.0) == 0
+
+def is_substochastic(P):
+    """True if a matrix is stochastic 
+
+    All entries must be non-negative and rows must sum to less than one
+    """
+    if not numpy.all(P >= 0):
+        return False
+    return numpy.all(numpy.sum(P, axis = 1) <= 1)
+
+def vertex_out_component(G, nodes):
+    """Find the set of reachable nodes on a graph
+    """
+    s = set(nodes)
+    for n in nodes:
+        reachable = networkx.shortest_path_length(G, n).keys()
+        s = s.union(reachable)
+    return s
+
+def transient_class(G, cpt):
+    """Find all the components, such that they can escape
+    """
+    return vertex_out_component(G, cpt) - set(cpt) != set() 
+
+def recurrent_class(G, cpt):
+    """Find all the components, such that they will never escape
+    """
+    return vertex_out_component(G, cpt) - set(cpt) == set() 
+
 
 class DiscreteTimeMarkovChain(object):
     """A discrete time Markov chain
@@ -30,7 +67,7 @@ class DiscreteTimeMarkovChain(object):
         if not is_square(self._P):
             raise DTMCError('Non-square transition matrix')
 
-        if not is_right_stochastic(self._P):
+        if not is_stochastic(self._P):
             raise DTMCError('Transition Matrix is not right stochastic')
 
     def _as_digraph(self):
@@ -56,6 +93,9 @@ class DiscreteTimeMarkovChain(object):
         #   only deals with square matrices.
         
         P = self._as_dense()
+
+    def stationary_distribution(self):
+        P = self._P
         n = P.shape[0]
         I = numpy.eye(n)
         # the transpose here is because we're working with a stationary row
@@ -91,11 +131,9 @@ class DiscreteTimeMarkovChain(object):
         return list(networkx.strongly_connected_components(G))
 
     def recurrent_classes(self):
-        raise NotImplementedError('todo')
-        return []
+        return [ recurrent_class(cpt) for cpt in self.communicating_classes() ]
 
     def transient_classes(self):
-        raise NotImplementedError('todo')
-        return []
+        return [ transient_class(cpt) for cpt in self.communicating_classes() ]
 
 
